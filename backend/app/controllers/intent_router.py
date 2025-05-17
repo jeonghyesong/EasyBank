@@ -74,9 +74,14 @@ async def handle_chat(request: Request):
             response_text = f"현재까지 쌓인 이자는 {interest}원입니다."
 
         elif intent in ["get_deposit_product_info", "get_savings_product_info", "get_loan_product_info"]:
-            product_type = intent.split("_")[1]
-            product_info = get_product_description(product_type)
-            response_text = product_info
+            type_str = intent.split("_")[1]  # deposit / savings / loan
+            try:
+                product_type = ProductType(type_str) 
+            except ValueError:
+                response_text = "상품 종류를 정확히 인식하지 못했어요."
+            else:
+                product_info = get_product_description(product_type)
+                response_text = product_info
 
         else:
             response_text = "죄송해요, 무슨 말씀이신지 잘 모르겠어요."
@@ -87,7 +92,7 @@ async def handle_chat(request: Request):
         return {"error": str(e)}
 
 # -------------------------
-# 🔧 보조 함수들
+#    보조 함수들
 # -------------------------
 
 def is_authenticated():
